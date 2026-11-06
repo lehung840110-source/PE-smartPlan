@@ -392,17 +392,6 @@ export async function exportCleanWordDocxFromData(options: ExportWordDataOptions
         <p style="font-size: 11.5pt; margin: 2pt 0 2pt 15pt; color: #78350f;">
           * <i>Học sinh khuyết tật:</i> ${escapeHtml(plan.qualities?.disabledStudents || 'Tuỳ tình hình tiến bộ của HS mà GV linh hoạt áp dụng với tinh thần học hoà nhập.')}
         </p>
-
-        <p style="font-size: 11.5pt; font-weight: bold; margin: 6pt 0 2pt 0;">4. Tích hợp liên môn</p>
-        <p style="font-size: 11.5pt; margin: 2pt 0 2pt 15pt;">
-          - <i>Năng lực số (${escapeHtml(plan.integrations?.digitalSkill)}):</i> ${escapeHtml(plan.integrations?.digitalDescription)}
-        </p>
-        <p style="font-size: 11.5pt; margin: 2pt 0 2pt 15pt;">
-          - <i>Giáo dục Quốc phòng và An ninh (QPAN):</i> Rèn luyện tác phong nhanh nhẹn, giữ vững cự ly chuẩn và tinh thần kỷ luật QPAN.
-        </p>
-        <p style="font-size: 11.5pt; margin: 2pt 0 2pt 15pt;">
-          - <i>Kỹ năng sống & An toàn:</i> ${escapeHtml(plan.integrations?.lifeSkills || 'GV hướng dẫn HS kiên trì, chờ đến lượt, phối hợp, nhận xét bạn bằng lời tích cực và chủ động báo khi cơ thể mệt hoặc khó chịu.')}
-        </p>
       </div>
 
       <!-- II. ĐỊA ĐIỂM – PHƯƠNG TIỆN -->

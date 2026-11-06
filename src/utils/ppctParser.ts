@@ -1,6 +1,10 @@
 import mammoth from 'mammoth';
 import { PpctItem, PpctAuditResult, WeeklyMasterScheduleRow } from '../types/gdtc';
 import { WeeklyIntegrationThemes } from './academicCalendar';
+import { getStoredPpctData, saveStoredPpctData } from '../data/defaultPpctData';
+
+export type { PpctItem, PpctAuditResult, WeeklyMasterScheduleRow };
+export { getStoredPpctData, saveStoredPpctData };
 
 /**
  * Universal PPCT Parser & Auditor for GDTC Grades 1, 3, 5
@@ -235,25 +239,25 @@ export function extractIntegrationFromPlan(
   const combined = `${cleanText}\n${allIntegTexts}`;
 
   // 2. Extract QPAN (Quốc phòng & An ninh)
-  const qpanMatch = combined.match(/(?:quốc\s*phòng\s*và\s*an\s*ninh|qpan)[^:\n]*[:\-]?\s*([^\n\r]+)/i);
+  const qpanMatch = combined.match(/(?:quốc\s*phòng\s*và\s*an\s*ninh|qpan)[^:\n]*[:\-]?\s*([^.;\n]{10,220}\.?)/i);
   if (qpanMatch) {
     result.qpanTheme = qpanMatch[1].replace(/^[–\-*+]\s*/, '').replace(/<[^>]+>/g, '').trim();
   }
 
   // 3. Extract Môi trường
-  const envMatch = combined.match(/(?:bảo\s*vệ\s*môi\s*trường|môi\s*trường)[^:\n]*[:\-]?\s*([^\n\r]+)/i);
+  const envMatch = combined.match(/(?:bảo\s*vệ\s*môi\s*trường|môi\s*trường)[^:\n]*[:\-]?\s*([^.;\n]{10,220}\.?)/i);
   if (envMatch) {
     result.envTheme = envMatch[1].replace(/^[–\-*+]\s*/, '').replace(/<[^>]+>/g, '').trim();
   }
 
   // 4. Extract Năng lực số (3.1TC1a, 4.1TC1a, 6.1TC2a)
-  const digitalMatch = combined.match(/(?:năng\s*lực\s*số|[346]\.1TC\w+)[^:\n]*[:\-]?\s*([^\n\r]+)/i);
+  const digitalMatch = combined.match(/(?:năng\s*lực\s*số|[1-6]\.1TC\w+)[^:\n]*[:\-]?\s*([^.;\n]{10,220}\.?)/i);
   if (digitalMatch) {
     result.digitalTheme = digitalMatch[0].replace(/^[–\-*+]\s*/, '').replace(/<[^>]+>/g, '').trim();
   }
 
   // 5. Extract Kỹ năng sống / An toàn
-  const skillMatch = combined.match(/(?:kỹ\s*năng\s*sống|an\s*toàn|đạo\s*đức)[^:\n]*[:\-]?\s*([^\n\r]+)/i);
+  const skillMatch = combined.match(/(?:kỹ\s*năng\s*sống|an\s*toàn|đạo\s*đức)[^:\n]*[:\-]?\s*([^.;\n]{10,220}\.?)/i);
   if (skillMatch) {
     result.lifeSkillsTheme = skillMatch[1].replace(/^[–\-*+]\s*/, '').replace(/<[^>]+>/g, '').trim();
   }

@@ -100,7 +100,117 @@ export interface AccurateMovementDetails {
   gvExplanation: string;
   hsTask: string;
   practiceFocus: string;
+  isMatched?: boolean;
 }
+
+export const AUTHENTIC_TEXTBOOK_MAP_BY_GRADE: Record<number, Record<string, { url: string; title: string }>> = {
+  1: {
+    vuon_tho: {
+      url: '/assets/sgk_chuan/k1_vuon_tho.jpg',
+      title: 'Động tác Vươn thở - SGK Lớp 1 (Trang 36)'
+    },
+    tay: {
+      url: '/assets/sgk_chuan/k1_tay.jpg',
+      title: 'Động tác Tay - SGK Lớp 1 (Trang 37)'
+    },
+    chan: {
+      url: '/assets/sgk_chuan/k1_chan.jpg',
+      title: 'Động tác Chân - SGK Lớp 1 (Trang 43)'
+    },
+    luon: {
+      url: '/assets/sgk_chuan/k1_luon.jpg',
+      title: 'Động tác Lườn - SGK Lớp 1 (Trang 44)'
+    },
+    bung: {
+      url: '/assets/sgk_chuan/k1_bung.jpg',
+      title: 'Động tác Bụng - SGK Lớp 1 (Trang 49)'
+    },
+    van_minh: {
+      url: '/assets/extracted_sgk/tuan8_img_6.jpg',
+      title: 'Động tác Vặn mình - Khối 1 (Trang 32 SGK)'
+    },
+    dung_nghiem: {
+      url: '/assets/extracted_sgk/tuan8_img_0.jpg',
+      title: 'Tư thế đứng nghiêm - Khối 1 (Trang 12 SGK)'
+    },
+    nhay: {
+      url: '/assets/extracted_sgk/tuan8_img_10.jpg',
+      title: 'Động tác Phối hợp - Khối 1 (Trang 37 SGK)'
+    },
+    dieu_hoa: {
+      url: '/assets/extracted_sgk/tuan8_img_23.jpg',
+      title: 'Động tác Điều hòa - Khối 1 (Trang 38 SGK)'
+    }
+  },
+  3: {
+    vuon_tho: {
+      url: '/assets/extracted_sgk/tuan8_img_4.jpg',
+      title: 'Động tác Vươn thở - Khối 3 (Trang 24 SGK)'
+    },
+    tay: {
+      url: '/assets/extracted_sgk/tuan8_img_6.jpg',
+      title: 'Động tác Tay - Khối 3 (Trang 26 SGK)'
+    },
+    chan: {
+      url: '/assets/extracted_sgk/tuan8_img_8.jpg',
+      title: 'Động tác Chân - Khối 3 (Trang 27 SGK)'
+    },
+    di_deu: {
+      url: '/assets/sgk_chuan/k3_di_deu_t9.jpg',
+      title: 'Động tác Đi đều - Khối 3 (Trang 16 SGK)'
+    },
+    dung_lai: {
+      url: '/assets/sgk_chuan/k3_di_deu_dung_lai.jpg',
+      title: 'Động tác Đứng lại - Khối 3 (Trang 18 SGK)'
+    },
+    on_di_deu: {
+      url: '/assets/sgk_chuan/k3_on_di_deu_doi_chan.jpg',
+      title: 'Đổi chân khi đi đều sai nhịp - Khối 3 (Trang 19 SGK)'
+    },
+    dung_nghiem: {
+      url: '/assets/extracted_sgk/tuan8_img_17.jpg',
+      title: 'Biến đổi đội hình - Khối 3 (Trang 11 SGK)'
+    },
+    nhay: {
+      url: '/assets/extracted_sgk/tuan9_img_11.jpg',
+      title: 'Nhảy dây kiểu chụm hai chân - Khối 3 (Trang 53 SGK)'
+    }
+  },
+  5: {
+    vuon_tho: {
+      url: '/assets/sgk_chuan/k5_vuon_tho_tay_gay.jpg',
+      title: 'Động tác Vươn thở với gậy - Khối 5 (Trang 25 SGK)'
+    },
+    tay: {
+      url: '/assets/sgk_chuan/k5_vuon_tho_tay_gay.jpg',
+      title: 'Động tác Tay với gậy - Khối 5 (Trang 26 SGK)'
+    },
+    chan: {
+      url: '/assets/sgk_chuan/k5_chan_voi_gay.jpg',
+      title: 'Động tác Chân với gậy - Khối 5 (Trang 27 SGK)'
+    },
+    bung: {
+      url: '/assets/sgk_chuan/k5_van_minh_toan_than_gay.jpg',
+      title: 'Động tác Bụng với gậy - Khối 5 (Trang 30 SGK)'
+    },
+    van_minh: {
+      url: '/assets/sgk_chuan/k5_van_minh_toan_than_gay.jpg',
+      title: 'Động tác Vặn mình với gậy - Khối 5 (Trang 31 SGK)'
+    },
+    toan_than: {
+      url: '/assets/sgk_chuan/k5_van_minh_toan_than_gay.jpg',
+      title: 'Động tác Toàn thân với gậy - Khối 5 (Trang 31 SGK)'
+    },
+    nhay: {
+      url: '/assets/extracted_sgk/tuan8_img_18.jpg',
+      title: 'Động tác Nhảy với gậy - Khối 5 (Trang 34 SGK)'
+    },
+    dieu_hoa: {
+      url: '/assets/extracted_sgk/tuan8_img_20.jpg',
+      title: 'Động tác Điều hòa với gậy - Khối 5 (Trang 35 SGK)'
+    }
+  }
+};
 
 export const AUTHENTIC_TEXTBOOK_MAP: Record<string, { url: string; title: string }> = {
   vuon_tho: {
@@ -152,6 +262,7 @@ export const AUTHENTIC_TEXTBOOK_MAP: Record<string, { url: string; title: string
 /**
  * Resolves accurate movement name, technical image, and pedagogical steps from text/title.
  * Strictly guarantees that games (Trò chơi) are NEVER attached to technical movements (Học động tác).
+ * Strictly guarantees that images are isolated to the requested grade and NEVER injects arbitrary fallback images.
  */
 export function resolveAccurateMovement(
   content: string = '',
@@ -217,26 +328,21 @@ export function resolveAccurateMovement(
     targetName = 'Động tác Lăn và Lộn xuôi';
   }
 
-  // Check if this is an review (Ôn tập) or change-step lesson for Grade 3
+  // Check if this is a review (Ôn tập) or change-step lesson for Grade 3
   if (targetKey === 'di_deu' && (combined.includes('ôn') || combined.includes('đổi chân') || combined.includes('sai nhịp') || combined.includes('tiết 4') || combined.includes('tiết 16'))) {
     targetKey = 'on_di_deu';
     targetName = 'Ôn Đi đều, Đứng lại & Đổi chân khi sai nhịp';
   }
 
-  // 1. Search in user library with STRICT filtering (must exclude all games and prioritize authentic photos over SVG vectors)
-  const technicalOnlyImages = userImages.filter((img) => !isGameImage(img));
-  const sortedCandidates = [
-    // Prioritize non-SVG authentic images first for the requested grade
-    ...technicalOnlyImages.filter((img) => String(img.grade) === String(grade) && !img.imgUrl.startsWith('data:image/svg+xml')),
-    ...technicalOnlyImages.filter((img) => String(img.grade) !== String(grade) && !img.imgUrl.startsWith('data:image/svg+xml')),
-    ...technicalOnlyImages.filter((img) => String(img.grade) === String(grade)),
-    ...technicalOnlyImages.filter((img) => String(img.grade) !== String(grade))
-  ];
+  // 1. Search in user library with STRICT filtering: SAME GRADE ONLY and exclude all games
+  const sameGradeImages = userImages.filter(
+    (img) => String(img.grade) === String(grade) && !isGameImage(img)
+  );
 
   let resolvedImgUrl = '';
   let resolvedImgTitle = '';
 
-  const matchedUserImg = sortedCandidates.find((img) => {
+  const matchedUserImg = sameGradeImages.find((img) => {
     const t = img.title.toLowerCase();
     const c = (img.caption || '').toLowerCase();
     if (t.includes('trò chơi') || t.includes('tro choi')) return false;
@@ -262,25 +368,29 @@ export function resolveAccurateMovement(
     return false;
   });
 
-  // Prefer authentic textbook images - never use synthetic recreated SVG graphics when authentic image exists!
+  const gradeAuthoritativeMap = AUTHENTIC_TEXTBOOK_MAP_BY_GRADE[grade] || AUTHENTIC_TEXTBOOK_MAP_BY_GRADE[1];
+
   if (matchedUserImg && !matchedUserImg.imgUrl.startsWith('data:image/svg+xml')) {
     resolvedImgUrl = matchedUserImg.imgUrl;
     resolvedImgTitle = matchedUserImg.title;
-  } else if (AUTHENTIC_TEXTBOOK_MAP[targetKey]) {
-    resolvedImgUrl = AUTHENTIC_TEXTBOOK_MAP[targetKey].url;
-    resolvedImgTitle = AUTHENTIC_TEXTBOOK_MAP[targetKey].title;
+  } else if (gradeAuthoritativeMap && gradeAuthoritativeMap[targetKey]) {
+    resolvedImgUrl = gradeAuthoritativeMap[targetKey].url;
+    resolvedImgTitle = gradeAuthoritativeMap[targetKey].title;
   } else if (matchedUserImg) {
     resolvedImgUrl = matchedUserImg.imgUrl;
     resolvedImgTitle = matchedUserImg.title;
   } else {
+    // Check if standard formation/movement matches this grade
     const std = findMatchingMovement(targetName, grade);
-    if (std) {
+    if (std && !std.svgDataUrl.startsWith('data:image/svg+xml')) {
       resolvedImgUrl = std.svgDataUrl;
       resolvedImgTitle = `Kỹ thuật SGK: ${std.name}`;
       targetName = std.name;
     } else {
-      resolvedImgUrl = '/assets/sgk_chuan/k1_vuon_tho.jpg';
-      resolvedImgTitle = `Kỹ thuật SGK: ${targetName}`;
+      // STRICT REQUIREMENT: If no verified image exists for this grade and movement,
+      // DO NOT force an arbitrary image! Leave empty so UI alerts teacher to pick or crop.
+      resolvedImgUrl = '';
+      resolvedImgTitle = '';
     }
   }
 
@@ -419,19 +529,27 @@ export function resolveAccurateMovement(
     movementSteps,
     gvExplanation,
     hsTask,
-    practiceFocus
+    practiceFocus,
+    isMatched: Boolean(resolvedImgUrl)
   };
+}
+
+export interface AccurateGameResult {
+  url: string;
+  title: string;
+  isMatched?: boolean;
 }
 
 /**
  * Resolves an authentic game image from the user library or standard SGK assets matching the game name.
+ * Strictly guarantees that images are isolated to the requested grade and NEVER injects arbitrary fallback games.
  */
 export function resolveAccurateGameImage(
   gameName: string = '',
   grade: number = 1,
   category: 'tro_choi_kd' | 'tro_choi_vd' = 'tro_choi_vd',
   userImages: SgkImageItem[] = []
-): { url: string; title: string } {
+): AccurateGameResult {
   const cleanName = (gameName || '').toLowerCase().trim();
 
   // 1. Search user library for exact or keyword matching strictly for this grade
@@ -450,68 +568,149 @@ export function resolveAccurateGameImage(
     if (match) {
       return {
         url: match.imgUrl,
-        title: match.title || `Trò chơi: ${gameName}`
+        title: match.title || `Trò chơi: ${gameName}`,
+        isMatched: true
       };
     }
   }
 
-  // 2. Authoritative textbook image mapping by grade
+  // 2. Authoritative textbook image mapping strictly by grade & authentic game keywords
   if (grade === 1) {
     if (cleanName.includes('kết bạn') || cleanName.includes('ket ban')) {
       return {
         url: '/assets/sgk_chuan/k1_tro_choi_ket_ban.jpg',
-        title: 'Trò chơi bổ trợ khởi động: Kết bạn - SGK GDTC 1 (Trang 31)'
+        title: 'Trò chơi bổ trợ khởi động: Kết bạn - SGK GDTC 1 (Trang 31)',
+        isMatched: true
       };
     }
     if (cleanName.includes('lò cò') || cleanName.includes('lo co') || cleanName.includes('tiếp sức')) {
       return {
         url: '/assets/sgk_chuan/k1_tro_choi_lo_co_tiep_suc.jpg',
-        title: 'Trò chơi bổ trợ khéo léo: Lò cò tiếp sức - SGK GDTC 1 (Trang 34)'
+        title: 'Trò chơi: Lò cò tiếp sức - SGK GDTC 1 (Trang 34)',
+        isMatched: true
       };
     }
-    if (cleanName.includes('thỏ') || cleanName.includes('tho') || cleanName.includes('hiệu lệnh')) {
+    if (cleanName.includes('thỏ nhường hang') || cleanName.includes('nhường hang')) {
+      return {
+        url: '/assets/extracted_sgk/tuan8_img_13.jpg',
+        title: 'Trò chơi: Thỏ nhường hang - SGK GDTC 1 (Trang 34)',
+        isMatched: true
+      };
+    }
+    if (cleanName.includes('con thỏ') || cleanName.includes('thỏ')) {
       return {
         url: '/assets/sgk_chuan/k1_tro_choi_tho.jpg',
-        title: `Trò chơi SGK Khối 1: ${gameName || 'Con thỏ / Làm theo hiệu lệnh'}`
+        title: `Trò chơi SGK Khối 1: ${gameName || 'Con thỏ'}`,
+        isMatched: true
       };
     }
-    // Default fallback for Grade 1
-    if (category === 'tro_choi_kd') {
+    if (cleanName.includes('hiệu lệnh') || cleanName.includes('đứng ngồi theo hiệu lệnh') || cleanName.includes('làm theo hiệu lệnh')) {
       return {
-        url: '/assets/sgk_chuan/k1_tro_choi_ket_ban.jpg',
-        title: 'Trò chơi bổ trợ khởi động: Kết bạn - SGK GDTC 1 (Trang 31)'
+        url: '/assets/extracted_sgk/tuan8_img_1.jpg',
+        title: 'Trò chơi khởi động: Đứng ngồi theo hiệu lệnh - Khối 1 (Trang 22 SGK)',
+        isMatched: true
       };
-    } else {
+    }
+    if (cleanName.includes('kéo co')) {
       return {
-        url: '/assets/sgk_chuan/k1_tro_choi_lo_co_tiep_suc.jpg',
-        title: 'Trò chơi bổ trợ khéo léo: Lò cò tiếp sức - SGK GDTC 1 (Trang 34)'
+        url: '/assets/extracted_sgk/tuan8_img_16.jpg',
+        title: 'Trò chơi: Kéo co an toàn - Khối 1 (Trang 50 SGK)',
+        isMatched: true
+      };
+    }
+  } else if (grade === 3) {
+    if (cleanName.includes('chui qua hầm') || cleanName.includes('chui ham') || cleanName.includes('hầm')) {
+      return {
+        url: '/assets/extracted_sgk/tuan8_img_2.jpg',
+        title: 'Trò chơi bổ trợ khởi động: Chui qua hầm - Khối 3',
+        isMatched: true
+      };
+    }
+    if (cleanName.includes('đua ô tô') || cleanName.includes('dua o to') || cleanName.includes('ô tô')) {
+      return {
+        url: '/assets/extracted_sgk/tuan9_img_0.jpg',
+        title: 'Trò chơi: Đua ô tô - Khối 3 (Trang 32 SGK)',
+        isMatched: true
+      };
+    }
+    if (cleanName.includes('tam giác') || cleanName.includes('tam giac')) {
+      return {
+        url: '/assets/sgk_chuan/k3_tro_choi_tam_giac.jpg',
+        title: 'Trò chơi: Chạy theo hình tam giác - Khối 3 (Trang 31 SGK)',
+        isMatched: true
+      };
+    }
+    if (cleanName.includes('chạy nhanh tiếp sức') || cleanName.includes('tiếp sức')) {
+      return {
+        url: '/assets/extracted_sgk/tuan8_img_3.jpg',
+        title: 'Trò chơi: Chạy nhanh tiếp sức - Khối 3 (Trang 35 SGK)',
+        isMatched: true
+      };
+    }
+    if (cleanName.includes('ném') || cleanName.includes('bắt bóng')) {
+      return {
+        url: '/assets/extracted_sgk/tuan8_img_7.jpg',
+        title: 'Trò chơi: Ném bóng trúng đích - Khối 3',
+        isMatched: true
+      };
+    }
+    if (cleanName.includes('tâng cầu') || cleanName.includes('cầu')) {
+      return {
+        url: '/assets/extracted_sgk/tuan8_img_17.jpg',
+        title: 'Trò chơi: Tâng cầu khéo léo - Khối 3',
+        isMatched: true
+      };
+    }
+    if (cleanName.includes('nhảy dây')) {
+      return {
+        url: '/assets/extracted_sgk/tuan9_img_11.jpg',
+        title: 'Trò chơi: Nhảy dây - Khối 3 (Trang 53 SGK)',
+        isMatched: true
+      };
+    }
+  } else if (grade === 5) {
+    if (cleanName.includes('đội nào nhanh nhất') || cleanName.includes('nhanh nhất') || cleanName.includes('nhanh nhat')) {
+      return {
+        url: '/assets/sgk_chuan/k5_tro_choi_doi_nao_nhanh_nhat.jpg',
+        title: 'Trò chơi bổ trợ khởi động: Đội nào nhanh nhất - SGK GDTC 5 (Trang 29)',
+        isMatched: true
+      };
+    }
+    if (cleanName.includes('chuyền gậy') || cleanName.includes('chuyen gay') || cleanName.includes('tiếp sức')) {
+      return {
+        url: '/assets/sgk_chuan/k5_chuyen_gay_tiep_suc.jpg',
+        title: 'Trò chơi: Chuyền gậy tiếp sức - SGK GDTC 5 (Trang 26)',
+        isMatched: true
+      };
+    }
+    if (cleanName.includes('ai kéo khoẻ') || cleanName.includes('kéo khoẻ') || cleanName.includes('kéo co')) {
+      return {
+        url: '/assets/extracted_sgk/tuan8_img_16.jpg',
+        title: 'Trò chơi: Ai kéo khoẻ hơn - Khối 5',
+        isMatched: true
+      };
+    }
+    if (cleanName.includes('chạy luồn cọc tiêu') || cleanName.includes('luồn cọc tiêu')) {
+      return {
+        url: '/assets/extracted_sgk/tuan8_img_14.jpg',
+        title: 'Trò chơi: Chạy luồn cọc tiêu - Khối 5',
+        isMatched: true
+      };
+    }
+    if (cleanName.includes('trao gậy') || cleanName.includes('nhận gậy')) {
+      return {
+        url: '/assets/extracted_sgk/tuan9_img_0.jpg',
+        title: 'Trò chơi: Trao và nhận gậy tiếp sức - Khối 5 (Trang 42 SGK)',
+        isMatched: true
       };
     }
   }
 
-  if (grade === 3) {
-    return {
-      url: '/assets/sgk_chuan/k3_tro_choi_tam_giac.jpg',
-      title: `Trò chơi SGK Khối 3: ${gameName || 'Chạy theo hình tam giác / Đua ô tô'}`
-    };
-  }
-
-  // Grade 5 (Bài tập thể dục với gậy)
-  if (cleanName.includes('nhanh nhất') || cleanName.includes('đội nào') || cleanName.includes('doi nao') || cleanName.includes('nhanh nhat')) {
-    return {
-      url: '/assets/sgk_chuan/k5_tro_choi_doi_nao_nhanh_nhat.jpg',
-      title: 'Trò chơi bổ trợ khởi động: Đội nào nhanh nhất - SGK GDTC 5 (Trang 29)'
-    };
-  }
-  if (category === 'tro_choi_kd') {
-    return {
-      url: '/assets/sgk_chuan/k5_tro_choi_doi_nao_nhanh_nhat.jpg',
-      title: `Trò chơi bổ trợ khởi động: ${gameName || 'Đội nào nhanh nhất'} - SGK GDTC 5 (Trang 29)`
-    };
-  }
+  // NO ARBITRARY FALLBACK: If game is unknown or does not have a verified textbook photo, return empty
   return {
-    url: '/assets/sgk_chuan/k5_chuyen_gay_tiep_suc.jpg',
-    title: `Trò chơi SGK Khối 5: ${gameName || 'Chuyền gậy tiếp sức'}`
+    url: '',
+    title: '',
+    isMatched: false
   };
 }
 

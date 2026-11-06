@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { X, Check, BookPlus, Sparkles, Loader2 } from 'lucide-react';
 import { ScenarioItem } from '../types/gdtc';
+import { X, Save, Sparkles } from 'lucide-react';
 
 interface ScenarioModalProps {
   isOpen: boolean;
   onClose: () => void;
-  scenarioToEdit?: ScenarioItem | null;
+  scenarioToEdit: ScenarioItem | null;
   onSave: (scenario: ScenarioItem) => void;
 }
 
@@ -15,226 +15,148 @@ export const ScenarioModal: React.FC<ScenarioModalProps> = ({
   scenarioToEdit,
   onSave,
 }) => {
-  const [formData, setFormData] = useState<ScenarioItem>({
-    id: '',
-    title: '',
-    category: 'Động tác mới',
-    grade: 'Chung',
-    lvd: "5 - 7'",
-    gv: '',
-    hs: ''
-  });
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState<ScenarioItem['category']>('Động tác mới');
+  const [grade, setGrade] = useState('Chung');
+  const [lvd, setLvd] = useState('5-7 phút');
+  const [gv, setGv] = useState('');
+  const [hs, setHs] = useState('');
 
   useEffect(() => {
     if (scenarioToEdit) {
-      setFormData(scenarioToEdit);
+      setTitle(scenarioToEdit.title);
+      setCategory(scenarioToEdit.category);
+      setGrade(scenarioToEdit.grade);
+      setLvd(scenarioToEdit.lvd);
+      setGv(scenarioToEdit.gv);
+      setHs(scenarioToEdit.hs);
     } else {
-      setFormData({
-        id: 'sc_' + Date.now(),
-        title: '',
-        category: 'Động tác mới',
-        grade: 'Chung',
-        lvd: "5 - 7'",
-        gv: '',
-        hs: ''
-      });
+      setTitle('');
+      setCategory('Động tác mới');
+      setGrade('Chung');
+      setLvd('5-7 phút');
+      setGv('');
+      setHs('');
     }
   }, [scenarioToEdit, isOpen]);
 
   if (!isOpen) return null;
 
-  const handleAiGenerate = async () => {
-    if (!formData.title.trim()) {
-      alert('Vui lòng nhập Tên kịch bản hoặc tên động tác trước khi dùng AI!');
-      return;
-    }
-
-    setIsGenerating(true);
-    try {
-      const res = await fetch('/api/ai/generate-scenario', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: formData.title,
-          category: formData.category,
-          grade: formData.grade,
-        }),
-      });
-
-      const data = await res.json();
-      if (data.success && data.scenario) {
-        setFormData((prev) => ({
-          ...prev,
-          lvd: data.scenario.lvd || prev.lvd,
-          gv: data.scenario.gv || prev.gv,
-          hs: data.scenario.hs || prev.hs,
-        }));
-      }
-    } catch (err) {
-      console.warn('AI scenario generate notice:', err);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.title.trim()) return alert('Vui lòng nhập tên kịch bản!');
-    onSave(formData);
-    onClose();
+    if (!title.trim()) return;
+
+    const item: ScenarioItem = {
+      id: scenarioToEdit ? scenarioToEdit.id : `sc_${Date.now()}`,
+      title,
+      category,
+      grade,
+      lvd,
+      gv,
+      hs
+    };
+    onSave(item);
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-200">
-        <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
-          <div className="flex items-center gap-2">
-            <BookPlus className="w-5 h-5 text-blue-600" />
-            <h3 className="font-bold text-slate-800 text-base">
-              {scenarioToEdit ? 'Chỉnh Sửa Kịch Bản Giảng Dạy' : 'Thêm Kịch Bản Mới Vào Thư Viện'}
-            </h3>
-          </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+          <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-blue-600" />
+            {scenarioToEdit ? 'Chỉnh Sửa Kịch Bản Giảng Dạy' : 'Thêm Kịch Bản Mới'}
+          </h3>
+          <button onClick={onClose} className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block font-semibold text-slate-700">
-                Tên Kịch Bản / Tên Hoạt Động
-              </label>
-              <button
-                type="button"
-                onClick={handleAiGenerate}
-                disabled={isGenerating}
-                className="text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1 transition disabled:opacity-50"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                    <span>AI Đang Soạn...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-3 h-3 text-indigo-600" />
-                    <span>AI Soạn Chi Tiết</span>
-                  </>
-                )}
-              </button>
-            </div>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Tên Kịch Bản</label>
             <input
               type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="VD: Động tác Tay - Hướng dẫn kỹ thuật nhịp 1-4"
-              className="w-full border border-slate-300 rounded-lg p-2.5 focus:border-blue-500 focus:outline-none"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="VD: Kịch bản dạy động tác mới theo nhóm..."
               required
+              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Loại Hoạt Động</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Thể Loại</label>
               <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
-                className="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:border-blue-500 focus:outline-none font-medium"
+                value={category}
+                onChange={(e) => setCategory(e.target.value as ScenarioItem['category'])}
+                className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-blue-500"
               >
-                <option value="Động tác mới">Động tác mới (Khám phá)</option>
-                <option value="Luyện tập">Luyện tập (Tổ / Cặp đôi)</option>
-                <option value="Trò chơi">Trò chơi vận động</option>
-                <option value="Mở đầu">Mở đầu & Khởi động</option>
-                <option value="Hồi tĩnh">Hồi tĩnh & Thả lỏng</option>
-                <option value="Vận dụng">Vận dụng & Tích hợp BVMT</option>
-                <option value="Tích hợp">Tích hợp KNS & An toàn</option>
+                <option value="Động tác mới">Động tác mới</option>
+                <option value="Luyện tập">Luyện tập</option>
+                <option value="Trò chơi">Trò chơi</option>
+                <option value="Hồi tĩnh">Hồi tĩnh</option>
               </select>
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Khối Lớp Áp Dụng</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Khối Lớp</label>
               <select
-                value={formData.grade}
-                onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
-                className="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 focus:border-blue-500 focus:outline-none font-medium"
+                value={grade}
+                onChange={(e) => setGrade(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white focus:ring-2 focus:ring-blue-500"
               >
-                <option value="Chung">Tất cả các khối</option>
+                <option value="Chung">Chung</option>
                 <option value="1">Khối 1</option>
-                <option value="2">Khối 2</option>
                 <option value="3">Khối 3</option>
-                <option value="4">Khối 4</option>
                 <option value="5">Khối 5</option>
               </select>
             </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Thời lượng (LVĐ)</label>
+              <input
+                type="text"
+                value={lvd}
+                onChange={(e) => setLvd(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">
-              Nội Dung Hoạt Động (Cột 1 - Động tác mới, luật chơi, nhận lớp, hồi tĩnh)
-            </label>
-            <textarea
-              rows={2}
-              value={formData.content || ''}
-              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-              placeholder="VD: 1.1 Nhận lớp: Kiểm tra vệ sinh sân tập... hoặc Tên trò chơi, luật chơi..."
-              className="w-full border border-slate-300 rounded-lg p-2 focus:border-blue-500 focus:outline-none font-medium"
-            />
-          </div>
-
-          <div>
-            <label className="block font-semibold text-slate-700 mb-1">Lượng Vận Động (Cột 2 - LVĐ)</label>
-            <input
-              type="text"
-              value={formData.lvd}
-              onChange={(e) => setFormData({ ...formData, lvd: e.target.value })}
-              placeholder="VD: 5 - 7', 2 - 3 lần, 2Lx8N"
-              className="w-full border border-slate-300 rounded-lg p-2 focus:border-blue-500 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block font-semibold text-slate-700 mb-1">
-              Kịch Bản Giáo Viên (Cột 3 - Lời giảng, khẩu lệnh, thị phạm, sửa sai)
-            </label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Hoạt động của Giáo viên (Cột 3)</label>
             <textarea
               rows={4}
-              value={formData.gv}
-              onChange={(e) => setFormData({ ...formData, gv: e.target.value })}
-              placeholder="- GV làm mẫu chuẩn xác 2-3 lần...&#10;- Hô nhịp dứt khoát..."
-              className="w-full border border-slate-300 rounded-lg p-2.5 focus:border-blue-500 focus:outline-none leading-relaxed"
-              required
+              value={gv}
+              onChange={(e) => setGv(e.target.value)}
+              placeholder="- GV làm mẫu 2-3 lần..."
+              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">
-              Kịch Bản Học Sinh (Cột 4 - Đội hình, động tác, phản hồi, cặp đôi)
-            </label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Hoạt động của Học sinh (Cột 4)</label>
             <textarea
               rows={4}
-              value={formData.hs}
-              onChange={(e) => setFormData({ ...formData, hs: e.target.value })}
-              placeholder="- Đội hình 4 hàng ngang cự ly 1 sải tay...&#10;- Quan sát mẫu và tập luyện..."
-              className="w-full border border-slate-300 rounded-lg p-2.5 focus:border-blue-500 focus:outline-none leading-relaxed"
-              required
+              value={hs}
+              onChange={(e) => setHs(e.target.value)}
+              placeholder="- HS quan sát và làm theo hiệu lệnh..."
+              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          <div className="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold"
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl"
             >
-              Hủy Bỏ
+              Hủy
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex items-center gap-1.5 shadow-2xs transition"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-sm"
             >
-              <Check className="w-4 h-4" />
-              <span>{scenarioToEdit ? 'Cập Nhật Kịch Bản' : 'Lưu Vào Thư Viện'}</span>
+              <Save className="w-4 h-4" /> Lưu Kịch Bản
             </button>
           </div>
         </form>

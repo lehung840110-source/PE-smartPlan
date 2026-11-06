@@ -1,0 +1,16 @@
+{
+  "application": "SmartPlan GDTC Pro - Bóc Tách Ảnh SGK & Kế Hoạch Bài Dạy AI",
+  "version": "1.0.0-original-restored",
+  "status": "MASTER_BASELINE",
+  "restoredAt": "2026-11-06T05:58:00-08:00",
+  "commitHash": "27c32b28c1809ca02ae69efca50aa6903a794c20",
+  "gitTag": "v1.0.0-master-baseline",
+  "features": [
+    "Khung kế hoạch bài dạy chuẩn GDPT 2018 (Tiểu học Khối 1 - 5)",
+    "Bóc tách, làm nét và phân loại hình ảnh SGK tự động",
+    "Thư viện kịch bản giảng dạy và lượng vận động chuẩn",
+    "Sơ đồ đội hình tập luyện đa dạng (Đồng loạt, Tổ/Nhóm, Cặp đôi, Vòng tròn)",
+    "Phần mềm tạo bài dạy AI tích hợp Gemini & xuất Word/PDF/In ấn",
+    "Thư viện ảnh động tác chuẩn hóa và sơ đồ chuyên biệt GDTC"
+  ]
+}

@@ -24,6 +24,7 @@ import {
 } from './data/defaultData';
 import { MasterPlanItem, masterPlansTuan8, normalizeMasterPlan } from './data/masterTemplateTuan8';
 import { masterPlansTuan9 } from './data/masterTemplateTuan9';
+import { masterPlansTuan10 } from './data/masterTemplateTuan10';
 import { SgkImageItem, ScenarioItem, SchoolSettings, LessonRow } from './types/gdtc';
 import {
   getAllImagesDB,
@@ -37,30 +38,31 @@ import {
 import { CheckCircle2, Loader2 } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>('tab-generator');
+  const [activeTab, setActiveTab] = useState<string>('tab-export');
 
   // IndexedDB-backed State
   const [images, setImages] = useState<SgkImageItem[]>(defaultSgkImages);
   const [scenarios, setScenarios] = useState<ScenarioItem[]>(defaultScenarios);
   const [schoolSettings, setSchoolSettings] = useState<SchoolSettings>(defaultSchoolSettings);
-  const [currentMasterPlan, setCurrentMasterPlan] = useState<MasterPlanItem>(masterPlansTuan8.k1_t15);
+  const [currentMasterPlan, setCurrentMasterPlan] = useState<MasterPlanItem>(masterPlansTuan10.k1_t19);
   // Synchronized All-Grades Master Plans Dictionary (K1, K3, K5 across weeks)
   const [allMasterPlans, setAllMasterPlans] = useState<Record<string, MasterPlanItem>>(() => {
     return {
       ...JSON.parse(JSON.stringify(masterPlansTuan8)),
-      ...JSON.parse(JSON.stringify(masterPlansTuan9))
+      ...JSON.parse(JSON.stringify(masterPlansTuan9)),
+      ...JSON.parse(JSON.stringify(masterPlansTuan10))
     };
   });
 
   // Generator Plan State
-  const [week, setWeek] = useState<number>(9);
+  const [week, setWeek] = useState<number>(10);
   const [grade, setGrade] = useState<number>(1);
-  const [lessonNum, setLessonNum] = useState<number>(17);
+  const [lessonNum, setLessonNum] = useState<number>(19);
   const [topic, setTopic] = useState<string>('CHỦ ĐỀ 2: BÀI THỂ DỤC');
   const [title, setTitle] = useState<string>(
-    'Bài 2: ĐỘNG TÁC CHÂN, ĐỘNG TÁC BỤNG (Tiết 1)'
+    'Bài 2: ĐỘNG TÁC CHÂN, ĐỘNG TÁC VẶN MÌNH, ĐỘNG TÁC BỤNG (Tiết 3)'
   );
-  const [lessonRows, setLessonRows] = useState<LessonRow[]>(initialLessonsData.k1_t15.rows);
+  const [lessonRows, setLessonRows] = useState<LessonRow[]>(masterPlansTuan10.k1_t19.rows);
 
   // Modals
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
@@ -90,37 +92,32 @@ export default function App() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const isDbLoadedRef = useRef<boolean>(false);
 
-  // 1. Initial Load from IndexedDB (with legacy localStorage migration)
+  // 1. Initial Load from IndexedDB (with automatic 109 images official sync)
   useEffect(() => {
     async function loadIndexedDB() {
       try {
         const storedImages = await getAllImagesDB();
-        if (storedImages && storedImages.length > 0) {
-          // Upgrade any legacy synthetic SVGs to authentic textbook photos if available
-          const upgraded = storedImages.map((img: SgkImageItem) => {
-            const defMatch = defaultSgkImages.find((d) => d.id === img.id);
-            if (defMatch && (img.imgUrl.startsWith('data:image/svg+xml') || !img.imgUrl)) {
-              return { ...img, imgUrl: defMatch.imgUrl };
-            }
-            return img;
-          });
-          // Ensure all default authentic images are present
-          const existingIds = new Set(upgraded.map((i: SgkImageItem) => i.id));
-          const merged = [...upgraded];
+        // If empty or if holding only the legacy dataset (<= 29 images), initialize directly with full 109 official images
+        if (!storedImages || storedImages.length === 0 || storedImages.length <= 29) {
+          setImages(defaultSgkImages);
+          await saveImagesDB(defaultSgkImages);
+          localStorage.removeItem('gdtc_sgk_images');
+        } else {
+          // If storedImages has custom user images, preserve them and ensure all 109 official images are merged
+          const existingIds = new Set(storedImages.map((i: SgkImageItem) => i.id));
+          const merged = [...storedImages];
+          let missingCount = 0;
           defaultSgkImages.forEach((def) => {
             if (!existingIds.has(def.id)) {
               merged.push(def);
+              existingIds.add(def.id);
+              missingCount++;
             }
           });
           setImages(merged);
-          await saveImagesDB(merged);
-        } else {
-          // Check if user had old localStorage items
-          const legacy = localStorage.getItem('gdtc_sgk_images');
-          const initial = legacy ? JSON.parse(legacy) : defaultSgkImages;
-          setImages(initial);
-          await saveImagesDB(initial);
-          localStorage.removeItem('gdtc_sgk_images'); // Free up localStorage quota
+          if (missingCount > 0) {
+            await saveImagesDB(merged);
+          }
         }
 
         const storedScenarios = await getAllScenariosDB();
@@ -139,49 +136,14 @@ export default function App() {
         const storedAllPlans = await getAppStateDB('gdtc_all_master_plans', null);
         if (storedAllPlans && typeof storedAllPlans === 'object') {
           const normalizedMap: Record<string, MasterPlanItem> = {
-            ...masterPlansTuan9
+            ...masterPlansTuan9,
+            ...masterPlansTuan10
           };
           Object.keys(storedAllPlans).forEach((key) => {
             const plan = normalizeMasterPlan(storedAllPlans[key]);
-            // Ensure Row 2 has authentic image rather than legacy SVG
-            if (plan.rows && plan.rows.length >= 2) {
-              const r2 = plan.rows[1];
-              if (r2.contentImgUrl?.startsWith('data:image/svg+xml') || !r2.contentImgUrl) {
-                if (key.includes('k3_t17') || key.includes('k3_t18')) {
-                  r2.contentImgUrl = '/assets/sgk_chuan/k1_vuon_tho.jpg';
-                  r2.contentImgTitle = 'Hình ảnh Kỹ thuật: Động tác Vươn thở & Động tác Tay (SGK GDTC Lớp 3)';
-                } else if (key.includes('k3_t16')) {
-                  r2.contentImgUrl = '/assets/sgk_chuan/k3_on_di_deu_doi_chan.jpg';
-                  r2.contentImgTitle = 'Hình ảnh Kỹ thuật: Ôn Đi đều, Đứng lại & Đổi chân khi sai nhịp (SGK GDTC Lớp 3)';
-                } else if (key.includes('k3_t15')) {
-                  r2.contentImgUrl = '/assets/sgk_chuan/k3_di_deu_dung_lai.jpg';
-                  r2.contentImgTitle = 'Hình ảnh Kỹ thuật: Động tác Đi đều, Đứng lại (SGK GDTC Lớp 3)';
-                } else if (key.includes('k1_t15')) {
-                  r2.contentImgUrl = '/assets/sgk_chuan/k1_vuon_tho.jpg';
-                  r2.contentImgTitle = 'Hình ảnh Kỹ thuật: Động tác Vươn thở (SGK GDTC Lớp 1)';
-                } else if (key.includes('k1_t16')) {
-                  r2.contentImgUrl = '/assets/sgk_chuan/k1_tay.jpg';
-                  r2.contentImgTitle = 'Hình ảnh Kỹ thuật: Động tác Tay (SGK GDTC Lớp 1)';
-                } else if (key.includes('k1_t17')) {
-                  r2.contentImgUrl = '/assets/sgk_chuan/k1_chan.jpg';
-                  r2.contentImgTitle = 'Hình ảnh Kỹ thuật: Động tác Chân & Vặn mình (SGK GDTC Lớp 1)';
-                } else if (key.includes('k1_t18')) {
-                  r2.contentImgUrl = '/assets/sgk_chuan/k1_bung.jpg';
-                  r2.contentImgTitle = 'Hình ảnh Kỹ thuật: Động tác Bụng (SGK GDTC Lớp 1)';
-                } else if (key.includes('k5_t15')) {
-                  r2.contentImgUrl = '/assets/sgk_chuan/k5_vuon_tho_tay_gay.jpg';
-                  r2.contentImgTitle = 'Hình ảnh Kỹ thuật: Động tác Vươn thở, Tay với gậy (SGK GDTC Lớp 5)';
-                } else if (key.includes('k5_t16')) {
-                  r2.contentImgUrl = '/assets/sgk_chuan/k5_chan_voi_gay.jpg';
-                  r2.contentImgTitle = 'Hình ảnh Kỹ thuật: Động tác Chân với gậy (SGK GDTC Lớp 5)';
-                } else if (key.includes('k5_t17') || key.includes('k5_t18')) {
-                  r2.contentImgUrl = '/assets/sgk_chuan/k5_van_minh_toan_than_gay.jpg';
-                  r2.contentImgTitle = 'Hình ảnh Kỹ thuật: Động tác Vặn mình & Bụng với gậy (SGK GDTC Lớp 5)';
-                }
-              }
-            }
-            // If stored plan is mismatched with authentic Week 9 plans, prefer authoritative Week 9 plan
-            if (masterPlansTuan9[key]) {
+            if (masterPlansTuan10[key]) {
+              normalizedMap[key] = masterPlansTuan10[key];
+            } else if (masterPlansTuan9[key]) {
               normalizedMap[key] = masterPlansTuan9[key];
             } else {
               normalizedMap[key] = plan;
@@ -190,27 +152,23 @@ export default function App() {
           setAllMasterPlans(normalizedMap);
         }
 
-        const storedMasterPlan = await getAppStateDB('master_plan', masterPlansTuan8.k1_t15);
+        const storedMasterPlan = await getAppStateDB('master_plan', masterPlansTuan10.k1_t19);
         if (storedMasterPlan) {
           const plan = normalizeMasterPlan(storedMasterPlan);
-          if (plan.rows && plan.rows.length >= 2 && plan.rows[1].contentImgUrl?.startsWith('data:image/svg+xml')) {
-            plan.rows[1].contentImgUrl = '/assets/sgk_chuan/k1_vuon_tho.jpg';
-          }
           setCurrentMasterPlan(plan);
         }
 
-        const storedRows = await getAppStateDB('current_lesson_rows', initialLessonsData.k1_t15.rows);
-        if (storedRows && storedRows.length >= 2 && storedRows[1].contentImgUrl?.startsWith('data:image/svg+xml')) {
-          storedRows[1].contentImgUrl = '/assets/sgk_chuan/k1_vuon_tho.jpg';
+        const storedRows = await getAppStateDB('current_lesson_rows', masterPlansTuan10.k1_t19.rows);
+        if (storedRows) {
+          setLessonRows(storedRows);
         }
-        setLessonRows(storedRows);
 
-        // Restore active week and lesson metadata
-        const savedWeek = await getAppStateDB('active_week', 9);
+        // Restore active week and lesson metadata (mặc định Tuần 10 như phiên bản chỉnh sửa)
+        const savedWeek = await getAppStateDB('active_week', 10);
         const savedGrade = await getAppStateDB('active_grade', 1);
-        const savedLessonNum = await getAppStateDB('active_lesson_num', 17);
+        const savedLessonNum = await getAppStateDB('active_lesson_num', 19);
         const savedTopic = await getAppStateDB('active_topic', 'CHỦ ĐỀ 2: BÀI THỂ DỤC');
-        const savedTitle = await getAppStateDB('active_title', 'BÀI 2: ĐỘNG TÁC CHÂN, ĐỘNG TÁC BỤNG (TIẾT 1)');
+        const savedTitle = await getAppStateDB('active_title', 'Bài 2: ĐỘNG TÁC CHÂN, ĐỘNG TÁC VẶN MÌNH, ĐỘNG TÁC BỤNG (Tiết 3)');
 
         setWeek(savedWeek);
         setGrade(savedGrade);
@@ -594,6 +552,12 @@ export default function App() {
     showToast(`Đã chèn kịch bản "${sc.title}" vào kế hoạch bài dạy!`);
   };
 
+  const handleSyncAll109Images = async () => {
+    setImages(defaultSgkImages);
+    await saveImagesDB(defaultSgkImages);
+    showToast('✨ Đã đồng bộ thành công trọn bộ 109 ảnh SGK chuẩn (Khối 1: 26, Khối 3: 46, Khối 5: 37)!');
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased font-sans">
       {/* Toast Notification */}
@@ -658,6 +622,7 @@ export default function App() {
             onAnalyzeVision={handleAnalyzeVision}
             onOpenSmartClean={handleOpenSmartClean}
             showToast={showToast}
+            onSync109Images={handleSyncAll109Images}
           />
         )}
 
@@ -718,6 +683,11 @@ export default function App() {
             onSwitchToMasterTemplate={() => setActiveTab('tab-extract')}
             showToast={showToast}
             onOpenImport={() => setIsImportModalOpen(true)}
+            onNavigateToScan={() => {
+              setActiveTab('tab-scan');
+              showToast('✂️ Chuyển sang Quét & Bóc Tách SGK!');
+            }}
+            onNavigateToLibrary={() => setActiveTab('tab-img-library')}
           />
         )}
 
@@ -744,6 +714,12 @@ export default function App() {
               setLessonRows(JSON.parse(JSON.stringify(updated.rows)));
             }}
             onNavigateToLibrary={() => setActiveTab('tab-img-library')}
+            onNavigateToScan={(targetGrade, lessonTitle) => {
+              if (targetGrade) setGrade(targetGrade);
+              if (lessonTitle) setTitle(lessonTitle);
+              setActiveTab('tab-scan');
+              showToast(`✂️ Chuyển sang Quét & Bóc Tách SGK${targetGrade ? ` Khối ${targetGrade}` : ''}!`);
+            }}
           />
         )}
       </main>

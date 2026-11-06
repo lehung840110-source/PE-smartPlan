@@ -456,7 +456,11 @@ export const defaultScenarios: ScenarioItem[] = [
   }
 ];
 
-export const defaultSgkImages: SgkImageItem[] = [
+import { comprehensiveSgkImages } from './sgkImageLibraryData';
+
+export const defaultSgkImages: SgkImageItem[] = comprehensiveSgkImages;
+
+export const legacyDefaultSgkImages: SgkImageItem[] = [
   // ===== KHỐI 1 - BẢN GỐC TỪ SGK KẾT NỐI TRI THỨC =====
   {
     id: 'img_sgk_k1_vuon_tho',
@@ -771,7 +775,7 @@ export const defaultSgkImages: SgkImageItem[] = [
   },
   {
     id: 'img_sgk_k5_tc_kd_ai_keo_khoe',
-    title: 'Trò chơi khởi động: Ai kéo khoẻ hơn / Chạy luồn cọc tiêu - Khối 5',
+    title: 'Trò chơi khởi động: Ai kéo khoẻ hơn - Khối 5',
     grade: '5',
     topicId: 'k5_cd2',
     topicTitle: 'CHỦ ĐỀ 2: BÀI TẬP THỂ DỤC VỚI GẬY',

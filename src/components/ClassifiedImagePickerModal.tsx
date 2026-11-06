@@ -56,7 +56,8 @@ export function classifyImageItem(img: SgkImageItem): ClassifiedImageInfo {
     'ai nhanh hơn',
     'ai kéo khoẻ',
     'ai kéo khỏe',
-    'gió thổi gậy'
+    'đội nào nhanh nhất',
+    'ai nhanh hơn với gậy'
   ];
   if (
     cat === 'tro_choi_khoi_dong' ||
